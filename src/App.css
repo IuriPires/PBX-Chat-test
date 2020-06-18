@@ -9,6 +9,10 @@
   width: 100vw;
 }
 
+.container--low-opacity {
+  background-color: rgba(0,0,0,0.5);
+}
+
 form {
   display: flex;
   justify-content: center;

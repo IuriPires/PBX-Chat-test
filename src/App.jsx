@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import { v4 as uuid } from 'uuid';
 
 import './App.css';
+import Modal from './components/modal';
 
 const socket = io('http://localhost:3000');
 socket.on('connect', () => console.log('Socket connected successfully'));
@@ -35,34 +36,40 @@ function App() {
   const handleInputChange = (event) => setMessage(event.target.value);
 
   return (
-    <div className="App container">
-      <ul className="list">
-        {messages.map((msg) => (
-          <li
-            className={`list__item list__item--${
-              msg.id === myId ? 'mine' : 'other'
-            }`}
-            key={msg.id + Math.random()}
-          >
-            <span
-              className={`message message--${
+    <>
+      {!userName && <Modal />}
+      <div
+        className={`App container ${!userName ? 'container--low-opacity' : ''}`}
+      >
+        <ul className="list">
+          {messages.map((msg) => (
+            <li
+              className={`list__item list__item--${
                 msg.id === myId ? 'mine' : 'other'
               }`}
+              key={msg.id + Math.random()}
             >
-              {msg.message}
-            </span>
-          </li>
-        ))}
-      </ul>
+              <span
+                className={`message message--${
+                  msg.id === myId ? 'mine' : 'other'
+                }`}
+              >
+                {msg.message}
+              </span>
+            </li>
+          ))}
+        </ul>
 
-      <form onSubmit={handleFormSubmit}>
-        <input
-          onChange={handleInputChange}
-          placeholder="message here"
-          value={message}
-        />
-      </form>
-    </div>
+        <form onSubmit={handleFormSubmit}>
+          <input
+            disabled={!userName}
+            onChange={handleInputChange}
+            placeholder="message here"
+            value={message}
+          />
+        </form>
+      </div>
+    </>
   );
 }
 
