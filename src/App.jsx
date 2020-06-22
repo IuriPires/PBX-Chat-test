@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
+import { Provider, useStore } from 'react-redux';
 import { v4 as uuid } from 'uuid';
+import socket from './services/socket';
 
 import './App.css';
+
 import Modal from './components/modal';
 
-const socket = io('http://localhost:3000');
-socket.on('connect', () => console.log('Socket connected successfully'));
+import store from './store';
 
 const myId = uuid();
 
@@ -14,18 +15,39 @@ function App() {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [userName, setUserName] = useState('');
+  const [usersAlreadyIn, setUsersAlreadyIn] = useState([]);
 
   useEffect(() => {
     const handleNewMessage = (newMessage) =>
       setMessages([...messages, newMessage]);
-    socket.on('chat.message', handleNewMessage);
-    return () => socket.off('chat.message', handleNewMessage);
+    socket.on('message.show', handleNewMessage);
+    return () => socket.off('message.show', handleNewMessage);
   }, [messages]);
+
+  function isUserAlreadyIn() {
+    return usersAlreadyIn.some((user) => user.id === myId);
+  }
+
+  useEffect(() => {
+    const handleNewUsers = (newUsers) => {
+      setUsersAlreadyIn(...usersAlreadyIn, newUsers);
+      if (!userName) {
+        const index = newUsers.findIndex((newUser) => newUser.id === myId);
+
+        setUserName(newUsers[index]);
+        console.log(userName, 'euu');
+      }
+    };
+    socket.on('guest.show', handleNewUsers);
+    console.log(usersAlreadyIn);
+    return () => socket.off('message.show', handleNewUsers);
+  }, [usersAlreadyIn]);
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
     if (message.trim()) {
-      socket.emit('chat.message', {
+      socket.emit('message.new', {
+        sender: userName,
         id: myId,
         message,
       });
@@ -36,10 +58,12 @@ function App() {
   const handleInputChange = (event) => setMessage(event.target.value);
 
   return (
-    <>
-      {!userName && <Modal />}
+    <Provider store={store}>
+      {!isUserAlreadyIn() && <Modal myId={myId} />}
       <div
-        className={`App container ${!userName ? 'container--low-opacity' : ''}`}
+        className={`container ${
+          !isUserAlreadyIn() ? 'container--low-opacity' : ''
+        }`}
       >
         <ul className="list">
           {messages.map((msg) => (
@@ -49,6 +73,7 @@ function App() {
               }`}
               key={msg.id + Math.random()}
             >
+              <span>{msg.name}</span>
               <span
                 className={`message message--${
                   msg.id === myId ? 'mine' : 'other'
@@ -62,14 +87,14 @@ function App() {
 
         <form onSubmit={handleFormSubmit}>
           <input
-            disabled={!userName}
+            disabled={!isUserAlreadyIn()}
             onChange={handleInputChange}
             placeholder="message here"
             value={message}
           />
         </form>
       </div>
-    </>
+    </Provider>
   );
 }
 
