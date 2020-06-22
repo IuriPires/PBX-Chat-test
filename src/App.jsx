@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Provider, useStore } from 'react-redux';
+import { Provider } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 import socket from './services/socket';
 
 import './App.css';
 
 import Modal from './components/modal';
+import UserAside from './components/usersAside';
 
 import store from './store';
 
@@ -24,22 +25,17 @@ function App() {
     return () => socket.off('message.show', handleNewMessage);
   }, [messages]);
 
-  function isUserAlreadyIn() {
-    return usersAlreadyIn.some((user) => user.id === myId);
-  }
-
   useEffect(() => {
     const handleNewUsers = (newUsers) => {
-      setUsersAlreadyIn(...usersAlreadyIn, newUsers);
+      const usersFlated = [...usersAlreadyIn, newUsers].flat();
+      setUsersAlreadyIn([...usersFlated]);
       if (!userName) {
         const index = newUsers.findIndex((newUser) => newUser.id === myId);
 
         setUserName(newUsers[index]);
-        console.log(userName, 'euu');
       }
     };
     socket.on('guest.show', handleNewUsers);
-    console.log(usersAlreadyIn);
     return () => socket.off('message.show', handleNewUsers);
   }, [usersAlreadyIn]);
 
@@ -59,12 +55,9 @@ function App() {
 
   return (
     <Provider store={store}>
-      {!isUserAlreadyIn() && <Modal myId={myId} />}
-      <div
-        className={`container ${
-          !isUserAlreadyIn() ? 'container--low-opacity' : ''
-        }`}
-      >
+      <UserAside usersAlreadyIn={usersAlreadyIn} />
+      {!userName && <Modal myId={myId} />}
+      <div className={`container ${!userName ? 'container--low-opacity' : ''}`}>
         <ul className="list">
           {messages.map((msg) => (
             <li
@@ -87,7 +80,7 @@ function App() {
 
         <form onSubmit={handleFormSubmit}>
           <input
-            disabled={!isUserAlreadyIn()}
+            disabled={!userName}
             onChange={handleInputChange}
             placeholder="message here"
             value={message}

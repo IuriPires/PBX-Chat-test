@@ -16,7 +16,9 @@ export const ContainerModal = styled.div`
 
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.15);
   padding: 3rem;
-  z-index: 9999;
+  z-index: 999;
+
+  background-color: #fafafa;
 `;
 
 export const Avatar = styled.img`

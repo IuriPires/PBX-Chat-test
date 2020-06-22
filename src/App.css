@@ -10,7 +10,7 @@
 }
 
 .container--low-opacity {
-  background-color: rgba(0,0,0,0.5);
+  /* background-color: rgba(0,0,0,0.5); */
 }
 
 form {
@@ -51,7 +51,7 @@ form input:focus {
 
 .list__item--other {
   color: blue;
-  text-align: left;
+  text-align: right;
 }
 
 .message {
