@@ -17,6 +17,6 @@ Por falta de tempo, infelizmente não consegui resolver alguns bugs e nem fazer 
 
 ##### Lista
 - Ao entrar com um usuário, está sendo duplicado os mesmo.
-- Ao utilizar o REDUX, tive um problema quando tentava usar os hooks *useSelector* e *useStore*. Infelizmente pela falta de tempo, não consegui ir à fundo. 
+- Ao utilizar o REDUX, tive um problema quando tentava usar os hooks *useSelector* e *useStore*, que impedem o uso da aplicação causando um crash. Infelizmente pela falta de tempo, não consegui ir à fundo. 
 
 
